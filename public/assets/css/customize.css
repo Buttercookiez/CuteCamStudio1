@@ -745,6 +745,9 @@ body {
     user-select: none;
     transition: transform 0.1s ease;
     transform-origin: center center;
+     touch-action: none; /* Prevent default touch behaviors like scrolling */
+    -webkit-user-select: none; /* Prevent text selection on iOS */
+    user-select: none;
 }
 
 .canvas-element:hover {
@@ -905,4 +908,16 @@ body {
 .canvas-element.active {
     outline: 2px dashed var(--primary);
     outline-offset: 2px;
+}
+
+/* Increase hit area for touch devices */
+@media (hover: none) and (pointer: coarse) {
+    .canvas-element {
+        outline-offset: 8px;
+    }
+    
+    .delete-btn, .resize-handle, .rotate-handle {
+        width: 32px !important;
+        height: 32px !important;
+    }
 }
