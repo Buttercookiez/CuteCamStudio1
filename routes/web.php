@@ -58,3 +58,8 @@ Route::get('/customize', function () {
 // Add this route
 Route::post('/photobooth/generate-frame', [PhotoboothController::class, 'generateFramedPhoto'])
      ->name('generate.frame');
+
+     
+Route::get('/', function () {
+    return view('landing'); // 👈 no .blade.php needed
+});
