@@ -1,3 +1,5 @@
+# Dockerfile
+
 FROM php:8.1-cli
 
 WORKDIR /app
@@ -8,18 +10,22 @@ RUN apt-get update && \
     curl -sS https://getcomposer.org/installer | php && \
     mv composer.phar /usr/local/bin/composer
 
-# Copy all project files
+# Copy app
 COPY . .
 
-# ✅ Create .env file so artisan commands work
+# Create .env
 RUN cp .env.example .env
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Run Laravel setup commands
+# Laravel key + config
 RUN php artisan key:generate && php artisan config:cache
 
+# ✅ Expose correct port
 EXPOSE 8080
 
+# ✅ Start Laravel server
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
+
+RUN php artisan storage:link
