@@ -1,0 +1,528 @@
+
+/* Base Variables */
+:root {
+    /* Colors */
+    --primary: #FF6B9E;
+    --primary-light: #FFA5C3;
+    --primary-dark: #E84C85;
+    --secondary: #6BD6D3;
+    --accent: #FFD166;
+    --dark: #1A1A1A;
+    --darker: #121212;
+    --light: #FFFFFF;
+    --light-gray: #F8F8F8;
+    --gray: #E0E0E0;
+    --dark-gray: #888888;
+    
+    /* Typography */
+    --font-main: 'Inter', sans-serif;
+    --font-heading: 'Playfair Display', serif;
+    --font-logo: 'Pacifico', cursive;
+    
+    /* Effects */
+    --transition: all 0.3s ease;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.12);
+    --shadow-xl: 0 20px 50px rgba(0,0,0,0.15);
+    --border-radius: 8px;
+    --border-radius-lg: 16px;
+}
+
+/* Dark Mode Variables */
+.dark-mode {
+    --dark: #FFFFFF;
+    --darker: #F5F5F5;
+    --light: #121212;
+    --light-gray: #1E1E1E;
+    --gray: #444444;
+    --dark-gray: #BBBBBB;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.25);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-main);
+    color: var(--dark);
+    background-color: var(--light);
+    line-height: 1.6;
+    overflow-x: hidden;
+    transition: var(--transition);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header */
+.main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px 0;
+    z-index: 100;
+    background-color: var(--light);
+    transition: var(--transition);
+}
+
+.header-content {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-logo);
+    font-size: 1.5rem;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.logo-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    transition: var(--transition);
+    object-fit: cover;
+    border: 2px solid var(--primary);
+    padding: 2px;
+    background-color: white;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    transition: var(--transition);
+    cursor: pointer;
+    gap: 8px;
+    border: none;
+    font-size: 0.95rem;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+}
+
+.btn-outline:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+}
+
+.btn-large {
+    padding: 14px 28px;
+    font-size: 1.1rem;
+}
+
+/* Photobooth Container */
+.photobooth-container {
+    padding: 80px 0 40px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.section-header h2 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+}
+
+.section-header p {
+    color: var(--dark-gray);
+    font-size: 1rem;
+}
+
+/* Setup Section */
+.setup-options {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    max-width: 500px;
+    margin: 0 auto 40px;
+}
+
+.option-group {
+    background-color: var(--light-gray);
+    padding: 25px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.option-group h3 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    text-align: center;
+    color: var(--primary);
+}
+
+.photo-count-selector, .timer-selector {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.count-option, .timer-option {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    background-color: var(--light);
+    color: var(--dark);
+    border: 2px solid var(--gray);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.count-option:hover, .timer-option:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.count-option.active, .timer-option.active {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.timer-option[data-timer="0"] {
+    font-size: 0.9rem;
+}
+
+.layout-preview {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.preview-slot {
+    width: 60px;
+    height: 60px;
+    background-color: var(--light);
+    border: 2px dashed var(--gray);
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.preview-slot:nth-child(1) {
+    display: block;
+}
+.preview-slot:nth-child(2),
+.preview-slot:nth-child(3),
+.preview-slot:nth-child(4) {
+    display: none;
+}
+
+.start-capture-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Capture Section */
+.camera-container {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto 30px;
+}
+
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* Square aspect ratio */
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    background-color: var(--dark);
+    box-shadow: var(--shadow-xl);
+}
+
+#camera-feed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.countdown-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 6rem;
+    font-weight: 700;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: var(--transition);
+    z-index: 10;
+}
+
+.flash-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    opacity: 0;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.status-indicator {
+    text-align: center;
+    margin-top: 15px;
+    font-weight: 500;
+    color: var(--primary);
+    font-size: 0.95rem;
+}
+
+.photo-slots {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.photo-slot {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--border-radius);
+    background-color: var(--light-gray);
+    border: 2px dashed var(--gray);
+    position: relative;
+    overflow: hidden;
+}
+
+.photo-slot.filled {
+    border: 2px solid var(--primary);
+}
+
+.photo-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.capture-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* Results Section */
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.result-photo {
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.result-photo img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.result-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.action-group {
+    display: flex;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .result-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .action-group {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .action-group .btn {
+        flex: 1;
+        max-width: 200px;
+    }
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: var(--light);
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    z-index: 99;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+}
+
+.sun-moon {
+    position: relative;
+    width: 24px;
+    height: 24px;
+}
+
+.sun-moon i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s ease;
+}
+
+.sun-moon .fa-sun {
+    opacity: 1;
+}
+
+.sun-moon .fa-moon {
+    opacity: 0;
+    color: var(--dark); /* Add this line to make moon icon use dark text color */
+}
+
+.dark-mode .sun-moon .fa-moon {
+    opacity: 1;
+    color: white; /* Force white color in dark mode */
+}
+.dark-mode .sun-moon .fa-moon {
+    opacity: 1;
+}
+
+/* Animations */
+@keyframes flash {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.flash {
+    animation: flash 0.3s ease-out;
+}
+
+/* Responsive Design */
+ /* Mobile-specific adjustments */
+    @media (max-width: 768px) {
+        .photobooth-container {
+            height: calc(100vh - 60px); /* Adjust based on your header height */
+        }
+        
+        .video-wrapper {
+            aspect-ratio: unset;
+        }
+        
+        #camera-feed {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+@media (max-width: 480px) {
+    .section-header h2 {
+        font-size: 1.6rem;
+    }
+    
+    .photo-slot {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .result-actions .btn {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    .logo-text {
+        display: none;
+    }
+}
