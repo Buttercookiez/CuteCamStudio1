@@ -195,14 +195,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        statusIndicator.textContent = `Photo ${currentPhoto + 1} of ${selectedCount}`;
-        
         if (selectedTimer > 0) {
             // Start countdown
+            statusIndicator.textContent = `Photo ${currentPhoto + 1} of ${selectedCount}`;
             startCountdown();
         } else {
-            // Capture immediately
-            capturePhoto();
+            // Show manual capture button
+            statusIndicator.innerHTML = `Photo ${currentPhoto + 1} of ${selectedCount} - <button id="manual-capture-btn" class="btn btn-primary btn-small">Capture Now</button>`;
+            
+            document.getElementById('manual-capture-btn').addEventListener('click', () => {
+                capturePhoto();
+            });
         }
     }
     
@@ -279,10 +282,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Move to next photo
         currentPhoto++;
         
-        // Small delay before next capture
-        setTimeout(() => {
-            captureNextPhoto();
-        }, 500);
+        // Small delay before next capture (only if not single photo)
+        if (selectedCount > 1) {
+            setTimeout(() => {
+                captureNextPhoto();
+            }, 500);
+        } else {
+            // For single photo, finish immediately
+            finishCapture();
+        }
     }
     
     function updatePhotoSlot(index, photoData) {
@@ -308,10 +316,23 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Display results
         displayResults();
+        
+        // Remove any manual capture button if it exists
+        const manualBtn = document.getElementById('manual-capture-btn');
+        if (manualBtn) {
+            manualBtn.remove();
+        }
     }
     
     function displayResults() {
         resultsGrid.innerHTML = '';
+        
+        // Add class for single photo
+        if (capturedPhotos.length === 1) {
+            resultsGrid.classList.add('single-photo');
+        } else {
+            resultsGrid.classList.remove('single-photo');
+        }
         
         capturedPhotos.forEach((photo, index) => {
             const photoElement = document.createElement('div');
@@ -326,6 +347,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (countdownInterval) {
             clearInterval(countdownInterval);
             countdownOverlay.style.opacity = '0';
+        }
+        
+        // Remove manual capture button if exists
+        const manualBtn = document.getElementById('manual-capture-btn');
+        if (manualBtn) {
+            manualBtn.remove();
         }
         
         // Stop camera
@@ -441,4 +468,3 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 });
-

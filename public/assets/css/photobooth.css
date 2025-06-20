@@ -526,3 +526,14 @@ h1, h2, h3, h4, h5, h6 {
         display: none;
     }
 }
+
+/* Add this to your CSS */
+#manual-capture-btn {
+    margin-top: 10px;
+}
+
+/* Update the results grid for single photo */
+.results-grid.single-photo {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+}
