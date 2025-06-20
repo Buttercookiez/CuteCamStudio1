@@ -355,27 +355,35 @@ document.addEventListener('DOMContentLoaded', () => {
         setupElementInteractions(elementDiv, element);
     }
 
-    function setupElementInteractions(element, data) {
-        const deleteBtn = element.querySelector('.delete-btn');
-        const resizeHandle = element.querySelector('.resize-handle');
-        const rotateHandle = element.querySelector('.rotate-handle');
+    // In the setupElementInteractions function, modify the delete button event listener
+function setupElementInteractions(element, data) {
+    const deleteBtn = element.querySelector('.delete-btn');
+    const resizeHandle = element.querySelector('.resize-handle');
+    const rotateHandle = element.querySelector('.rotate-handle');
+    
+    // Modified delete button event listeners
+    deleteBtn.addEventListener('click', handleDelete);
+    deleteBtn.addEventListener('touchend', handleDelete);
+    
+    function handleDelete(e) {
+        e.stopPropagation();
+        e.preventDefault(); // Add this for touch events
+        removeElement(data.id);
+    }
+    
+    // Rest of the function remains the same...
+    // Show controls when element is clicked/tapped
+    element.addEventListener('click', handleElementClick);
+    element.addEventListener('touchstart', handleElementClick, { passive: false });
+    
+    function handleElementClick(e) {
+        // Prevent default for touch events to avoid double-tap zoom
+        if (e.type === 'touchstart') {
+            e.preventDefault();
+        }
         
-        // Delete button always works
-        deleteBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            removeElement(data.id);
-        });
-        
-        // Show controls when element is clicked/tapped
-        element.addEventListener('click', handleElementClick);
-        element.addEventListener('touchstart', handleElementClick, { passive: false });
-        
-        function handleElementClick(e) {
-            // Prevent default for touch events to avoid double-tap zoom
-            if (e.type === 'touchstart') {
-                e.preventDefault();
-            }
-            
+        // Only proceed if the click wasn't on the delete button
+        if (e.target !== deleteBtn && !e.target.closest('.delete-btn')) {
             // Hide all other controls first
             document.querySelectorAll('.resize-handle, .rotate-handle').forEach(control => {
                 control.style.display = 'none';
@@ -388,8 +396,9 @@ document.addEventListener('DOMContentLoaded', () => {
             resizeHandle.style.display = 'flex';
             rotateHandle.style.display = 'flex';
             element.classList.add('active');
-            e.stopPropagation();
         }
+        e.stopPropagation();
+    }
         
         // Hide controls when clicking/touching outside
         document.addEventListener('click', hideControls);

@@ -910,14 +910,3 @@ body {
     outline-offset: 2px;
 }
 
-/* Increase hit area for touch devices */
-@media (hover: none) and (pointer: coarse) {
-    .canvas-element {
-        outline-offset: 8px;
-    }
-    
-    .delete-btn, .resize-handle, .rotate-handle {
-        width: 32px !important;
-        height: 32px !important;
-    }
-}
