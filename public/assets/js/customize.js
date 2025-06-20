@@ -187,44 +187,38 @@ document.addEventListener('DOMContentLoaded', () => {
         activeElements.forEach(element => createCanvasElement(element));
     }
 
-    function applyFilter(context = ctx) {
-        // Reset filter first
-        context.filter = 'none';
-        
-        // Apply selected filter
-        switch(currentFilter) {
-            case 'normal': 
-                context.filter = 'none'; 
-                break;
-            case 'grayscale': 
-                context.filter = 'grayscale(100%)'; 
-                break;
-            case 'sepia': 
-                context.filter = 'sepia(100%)'; 
-                break;
-            case 'bright': 
-                context.filter = 'brightness(1.2) contrast(1.1)'; 
-                break;
-            case 'cool': 
-                context.filter = 'brightness(1.1) hue-rotate(180deg) saturate(1.5)'; 
-                break;
-            case 'warm': 
-                context.filter = 'brightness(1.1) hue-rotate(-20deg) saturate(1.5)'; 
-                break;
-            case 'sketch':
-                context.filter = 'contrast(1.5) brightness(1.1) saturate(0)';
-                break;
-            case 'stencil1':
-                context.filter = 'contrast(2) brightness(0)';
-                break;
-            case 'stencil2':
-                context.filter = 'contrast(2) brightness(0) invert(1)';
-                break;
-            case 'retro':
-                context.filter = 'sepia(0.5) contrast(1.25) brightness(1.15) saturate(2)';
-                break;
-        }
+   function applyFilter(context = ctx) {
+    // Reset filter first
+    context.filter = 'none';
+    
+    // Apply selected filter
+    switch(currentFilter) {
+        case 'normal': 
+            context.filter = 'none'; 
+            break;
+        case 'grayscale': 
+            context.filter = 'grayscale(100%)'; 
+            break;
+        case 'sepia': 
+            context.filter = 'sepia(100%)'; 
+            break;
+        case 'bright': 
+            context.filter = 'brightness(1.2) contrast(1.1)'; 
+            break;
+        case 'cool': 
+            context.filter = 'brightness(1.1) hue-rotate(-20deg) saturate(1.5)'; 
+            break;
+        case 'warm': 
+            context.filter = 'brightness(1.1) hue-rotate(180deg) saturate(1.5)'; 
+            break;
+        case 'sketch':
+            context.filter = 'contrast(1.5) brightness(1.1) saturate(0)';
+            break;
+        case 'retro':
+            context.filter = 'sepia(0.5) contrast(1.25) brightness(1.15) saturate(2)';
+            break;
     }
+}
 
     function loadCapturedPhotos() {
         capturedPhotos = Array.from(photoOptions).map(option => option.querySelector('img').src);
@@ -672,7 +666,125 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function showPreviewModal() {
+    async function showPreviewModal() {
+    const tempCanvas = document.createElement('canvas');
+    const borderSize = 5;
+    const photoBorderSize = 5;
+    tempCanvas.width = canvas.width + (borderSize * 2);
+    tempCanvas.height = canvas.height + (borderSize * 2);
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    tempCtx.fillStyle = '#FFFFFF';
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    
+    tempCtx.fillStyle = frameColor;
+    tempCtx.fillRect(
+        borderSize, 
+        borderSize, 
+        tempCanvas.width - (borderSize * 2), 
+        tempCanvas.height - (borderSize * 2)
+    );
+
+    const photoCount = Math.min(4, capturedPhotos.length);
+    const { photoSize, photoGap } = calculateDimensions(photoCount);
+    let yPos = FRAME_PADDING + borderSize;
+
+    for (let i = 0; i < photoCount; i++) {
+        tempCtx.fillStyle = '#FFFFFF';
+        tempCtx.fillRect(
+            FRAME_PADDING + borderSize - photoBorderSize, 
+            yPos - photoBorderSize, 
+            photoSize + (photoBorderSize * 2), 
+            photoSize + (photoBorderSize * 2)
+        );
+        
+        const img = await loadImageSafe(capturedPhotos[i]);
+        if (img && img.complete && img.naturalHeight !== 0) {
+            tempCtx.save();
+            applyFilter(tempCtx);
+            
+            const imgAspect = img.width / img.height;
+            let drawWidth, drawHeight, x, y;
+            
+            if (imgAspect > 1) {
+                drawWidth = photoSize;
+                drawHeight = drawWidth / imgAspect;
+                x = FRAME_PADDING + borderSize;
+                y = yPos + (photoSize - drawHeight) / 2;
+            } else {
+                drawHeight = photoSize;
+                drawWidth = drawHeight * imgAspect;
+                x = FRAME_PADDING + borderSize + (photoSize - drawWidth) / 2;
+                y = yPos;
+            }
+            
+            tempCtx.drawImage(img, x, y, drawWidth, drawHeight);
+            tempCtx.restore();
+        }
+        yPos += photoSize + photoGap;
+    }
+    
+    // Draw all active elements
+    for (const element of activeElements) {
+        if (element.type === 'sticker') {
+            const img = await loadImageSafe(element.src);
+            if (img) {
+                tempCtx.save();
+                // Calculate the center point of the sticker
+                const centerX = element.x + element.width/2 + borderSize;
+                const centerY = element.y + element.height/2 + borderSize;
+                
+                tempCtx.translate(centerX, centerY);
+                tempCtx.rotate(element.rotation * Math.PI / 180);
+                
+                // Maintain aspect ratio when drawing
+                const stickerAspect = img.width / img.height;
+                let drawWidth, drawHeight;
+                
+                if (stickerAspect > 1) {
+                    drawWidth = element.width;
+                    drawHeight = drawWidth / stickerAspect;
+                } else {
+                    drawHeight = element.height;
+                    drawWidth = drawHeight * stickerAspect;
+                }
+                
+                tempCtx.drawImage(
+                    img, 
+                    -drawWidth/2, 
+                    -drawHeight/2, 
+                    drawWidth, 
+                    drawHeight
+                );
+                tempCtx.restore();
+            }
+        } else if (element.type === 'text') {
+            tempCtx.save();
+            tempCtx.translate(
+                element.x + element.width/2 + borderSize, 
+                element.y + element.height/2 + borderSize
+            );
+            tempCtx.rotate(element.rotation * Math.PI / 180);
+            tempCtx.font = `${element.size}px ${element.font}`;
+            tempCtx.fillStyle = element.color;
+            tempCtx.textAlign = 'center';
+            tempCtx.textBaseline = 'middle';
+            tempCtx.fillText(element.content, 0, 0);
+            tempCtx.restore();
+        }
+    }
+    
+    modalPreviewImage.src = tempCanvas.toDataURL('image/png');
+    previewModal.classList.add('active');
+}
+
+    async function downloadCanvas() {
+    try {
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.className = 'loading-overlay';
+        loadingOverlay.innerHTML = '<div>Preparing download...</div>';
+        document.body.appendChild(loadingOverlay);
+
         const tempCanvas = document.createElement('canvas');
         const borderSize = 5;
         const photoBorderSize = 5;
@@ -704,51 +816,67 @@ document.addEventListener('DOMContentLoaded', () => {
                 photoSize + (photoBorderSize * 2)
             );
             
-            const img = new Image();
-            img.src = capturedPhotos[i];
-            if (img.complete && img.naturalHeight !== 0) {
-                tempCtx.save();
-                applyFilter(tempCtx);
-                
-                const imgAspect = img.width / img.height;
-                let drawWidth, drawHeight, x, y;
-                
-                if (imgAspect > 1) {
-                    drawWidth = photoSize;
-                    drawHeight = drawWidth / imgAspect;
-                    x = FRAME_PADDING + borderSize;
-                    y = yPos + (photoSize - drawHeight) / 2;
-                } else {
-                    drawHeight = photoSize;
-                    drawWidth = drawHeight * imgAspect;
-                    x = FRAME_PADDING + borderSize + (photoSize - drawWidth) / 2;
-                    y = yPos;
-                }
-                
-                tempCtx.drawImage(img, x, y, drawWidth, drawHeight);
-                tempCtx.restore();
+            const img = await loadImageSafe(capturedPhotos[i]);
+            if (!img) continue;
+
+            tempCtx.save();
+            applyFilter(tempCtx);
+            
+            const imgAspect = img.width / img.height;
+            let drawWidth, drawHeight, x, y;
+            
+            if (imgAspect > 1) {
+                drawWidth = photoSize;
+                drawHeight = drawWidth / imgAspect;
+                x = FRAME_PADDING + borderSize;
+                y = yPos + (photoSize - drawHeight) / 2;
+            } else {
+                drawHeight = photoSize;
+                drawWidth = drawHeight * imgAspect;
+                x = FRAME_PADDING + borderSize + (photoSize - drawWidth) / 2;
+                y = yPos;
             }
+            
+            tempCtx.drawImage(img, x, y, drawWidth, drawHeight);
+            tempCtx.restore();
+            
             yPos += photoSize + photoGap;
         }
-        
-        activeElements.forEach(element => {
+
+        // Draw all active elements
+        for (const element of activeElements) {
             if (element.type === 'sticker') {
-                const img = new Image();
-                img.src = element.src;
-                tempCtx.save();
-                tempCtx.translate(
-                    element.x + element.width/2 + borderSize, 
-                    element.y + element.height/2 + borderSize
-                );
-                tempCtx.rotate(element.rotation * Math.PI / 180);
-                tempCtx.drawImage(
-                    img, 
-                    -element.width/2, 
-                    -element.height/2, 
-                    element.width, 
-                    element.height
-                );
-                tempCtx.restore();
+                const img = await loadImageSafe(element.src);
+                if (img) {
+                    tempCtx.save();
+                    // Calculate the center point of the sticker
+                    const centerX = element.x + element.width/2 + borderSize;
+                    const centerY = element.y + element.height/2 + borderSize;
+                    
+                    tempCtx.translate(centerX, centerY);
+                    tempCtx.rotate(element.rotation * Math.PI / 180);
+                    
+                    // Maintain aspect ratio when drawing
+                    const stickerAspect = img.width / img.height;
+                    let drawWidth, drawHeight;
+                    
+                    if (stickerAspect > 1) {
+                        drawWidth = element.width;
+                        drawHeight = drawWidth / stickerAspect;
+                    } else {
+                        drawHeight = element.height;
+                        drawWidth = drawHeight * stickerAspect;
+                    }
+                    
+                    tempCtx.drawImage(
+                        img, 
+                        -drawWidth/2, 
+                        -drawHeight/2, 
+                        drawWidth, 
+                        drawHeight
+                    );
+                    tempCtx.restore();
+                }
             } else if (element.type === 'text') {
                 tempCtx.save();
                 tempCtx.translate(
@@ -763,126 +891,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 tempCtx.fillText(element.content, 0, 0);
                 tempCtx.restore();
             }
-        });
-        
-        modalPreviewImage.src = tempCanvas.toDataURL('image/png');
-        previewModal.classList.add('active');
-    }
-
-    async function downloadCanvas() {
-        try {
-            const loadingOverlay = document.createElement('div');
-            loadingOverlay.className = 'loading-overlay';
-            loadingOverlay.innerHTML = '<div>Preparing download...</div>';
-            document.body.appendChild(loadingOverlay);
-
-            const tempCanvas = document.createElement('canvas');
-            const borderSize = 5;
-            const photoBorderSize = 5;
-            tempCanvas.width = canvas.width + (borderSize * 2);
-            tempCanvas.height = canvas.height + (borderSize * 2);
-            const tempCtx = tempCanvas.getContext('2d');
-            
-            tempCtx.fillStyle = '#FFFFFF';
-            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-            
-            tempCtx.fillStyle = frameColor;
-            tempCtx.fillRect(
-                borderSize, 
-                borderSize, 
-                tempCanvas.width - (borderSize * 2), 
-                tempCanvas.height - (borderSize * 2)
-            );
-
-            const photoCount = Math.min(4, capturedPhotos.length);
-            const { photoSize, photoGap } = calculateDimensions(photoCount);
-            let yPos = FRAME_PADDING + borderSize;
-
-            for (let i = 0; i < photoCount; i++) {
-                tempCtx.fillStyle = '#FFFFFF';
-                tempCtx.fillRect(
-                    FRAME_PADDING + borderSize - photoBorderSize, 
-                    yPos - photoBorderSize, 
-                    photoSize + (photoBorderSize * 2), 
-                    photoSize + (photoBorderSize * 2)
-                );
-                
-                const img = await loadImageSafe(capturedPhotos[i]);
-                if (!img) continue;
-
-                tempCtx.save();
-                applyFilter(tempCtx);
-                
-                const imgAspect = img.width / img.height;
-                let drawWidth, drawHeight, x, y;
-                
-                if (imgAspect > 1) {
-                    drawWidth = photoSize;
-                    drawHeight = drawWidth / imgAspect;
-                    x = FRAME_PADDING + borderSize;
-                    y = yPos + (photoSize - drawHeight) / 2;
-                } else {
-                    drawHeight = photoSize;
-                    drawWidth = drawHeight * imgAspect;
-                    x = FRAME_PADDING + borderSize + (photoSize - drawWidth) / 2;
-                    y = yPos;
-                }
-                
-                tempCtx.drawImage(img, x, y, drawWidth, drawHeight);
-                tempCtx.restore();
-                
-                yPos += photoSize + photoGap;
-            }
-
-            for (const element of activeElements.filter(el => el.type === 'sticker')) {
-                const img = await loadImageSafe(element.src);
-                if (img) {
-                    tempCtx.save();
-                    tempCtx.translate(
-                        element.x + element.width/2 + borderSize, 
-                        element.y + element.height/2 + borderSize
-                    );
-                    tempCtx.rotate(element.rotation * Math.PI / 180);
-                    tempCtx.drawImage(
-                        img, 
-                        -element.width/2, 
-                        -element.height/2, 
-                        element.width, 
-                        element.height
-                    );
-                    tempCtx.restore();
-                }
-            }
-
-            activeElements
-                .filter(el => el.type === 'text')
-                .forEach(text => {
-                    tempCtx.save();
-                    tempCtx.translate(
-                        text.x + text.width/2 + borderSize, 
-                        text.y + text.height/2 + borderSize
-                    );
-                    tempCtx.rotate(text.rotation * Math.PI / 180);
-                    tempCtx.font = `${text.size}px ${text.font}`;
-                    tempCtx.fillStyle = text.color;
-                    tempCtx.textAlign = 'center';
-                    tempCtx.textBaseline = 'middle';
-                    tempCtx.fillText(text.content, 0, 0);
-                    tempCtx.restore();
-                });
-
-            const link = document.createElement('a');
-            link.download = 'cute-cam-' + new Date().toISOString().slice(0, 10) + '.png';
-            link.href = tempCanvas.toDataURL('image/png');
-            link.click();
-
-        } catch (error) {
-            console.error('Download failed:', error);
-            alert('Download failed. Please try again.');
-        } finally {
-            document.querySelector('.loading-overlay')?.remove();
         }
+
+        const link = document.createElement('a');
+        link.download = 'cute-cam-' + new Date().toISOString().slice(0, 10) + '.png';
+        link.href = tempCanvas.toDataURL('image/png');
+        link.click();
+
+    } catch (error) {
+        console.error('Download failed:', error);
+        alert('Download failed. Please try again.');
+    } finally {
+        document.querySelector('.loading-overlay')?.remove();
     }
+}
 
     function openShareModal() {
         shareModal.classList.add('active');

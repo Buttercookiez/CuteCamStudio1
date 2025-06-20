@@ -197,12 +197,6 @@
                                         </div>
                                         <span>Sketch</span>
                                     </div>
-                                    <div class="filter-option" data-filter="stencil1">
-                                        <div class="filter-preview">
-                                            <img src="/assets/filters/stencil1.jpg" alt="Stencil">
-                                        </div>
-                                        <span>Stencil</span>
-                                    </div>
                                     <div class="filter-option" data-filter="retro">
                                         <div class="filter-preview">
                                             <img src="/assets/filters/retro.jpg" alt="Retro">
