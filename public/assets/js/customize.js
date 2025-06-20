@@ -29,6 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalCloseButtons = document.querySelectorAll('.modal-close');
 
     // Constants
+    const DESKTOP_CANVAS_PADDING = 10;
+    const MOBILE_CANVAS_PADDING = 8;
     const PHOTO_SIZE = 300;
     const PHOTO_GAP = 30;
     const FRAME_PADDING = 40;
@@ -356,47 +358,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function createCanvasElement(element) {
-        const elementDiv = document.createElement('div');
-        elementDiv.className = 'canvas-element';
-        elementDiv.dataset.id = element.id;
-        elementDiv.style.left = `${element.x}px`;
-        elementDiv.style.top = `${element.y}px`;
-        elementDiv.style.width = `${element.width}px`;
-        elementDiv.style.height = `${element.height}px`;
-        elementDiv.style.transform = `rotate(${element.rotation}deg)`;
-        
-        if (element.type === 'sticker') {
-            elementDiv.innerHTML = `
-                <img src="${element.src}" style="width:100%; height:100%; object-fit:contain;">
-                <div class="delete-btn">&times;</div>
-                <div class="resize-handle"></div>
-                <div class="rotate-handle"><i class="fas fa-sync-alt"></i></div>
-            `;
-        } else if (element.type === 'text') {
-            elementDiv.innerHTML = `
-                <div style="width:100%; height:100%; font-family:${element.font}; 
-                    color:${element.color}; font-size:${element.size}px; display:flex;
-                    align-items:center; justify-content:center; transform:rotate(${element.rotation}deg);">
-                    ${element.content}
-                </div>
-                <div class="delete-btn">&times;</div>
-                <div class="resize-handle"></div>
-                <div class="rotate-handle"><i class="fas fa-sync-alt"></i></div>
-            `;
-        }
-
-        // Initially hide controls (they'll show when element is active)
-        const deleteBtn = elementDiv.querySelector('.delete-btn');
-        const resizeHandle = elementDiv.querySelector('.resize-handle');
-        const rotateHandle = elementDiv.querySelector('.rotate-handle');
-        
-        deleteBtn.style.display = 'none';
-        resizeHandle.style.display = 'none';
-        rotateHandle.style.display = 'none';
-        
-        canvasOverlay.appendChild(elementDiv);
-        setupElementInteractions(elementDiv, element);
+    const elementDiv = document.createElement('div');
+    elementDiv.className = 'canvas-element';
+    elementDiv.dataset.id = element.id;
+    
+    // Adjust position calculation to account for border offsets
+    elementDiv.style.left = `${element.x}px`;
+    elementDiv.style.top = `${element.y}px`;
+    elementDiv.style.width = `${element.width}px`;
+    elementDiv.style.height = `${element.height}px`;
+    elementDiv.style.transform = `rotate(${element.rotation}deg)`;
+    
+    if (element.type === 'sticker') {
+        elementDiv.innerHTML = `
+            <img src="${element.src}" style="width:100%; height:100%; object-fit:contain;">
+            <div class="delete-btn">&times;</div>
+            <div class="resize-handle"></div>
+            <div class="rotate-handle"><i class="fas fa-sync-alt"></i></div>
+        `;
+    } else if (element.type === 'text') {
+        elementDiv.innerHTML = `
+            <div style="width:100%; height:100%; font-family:${element.font}; 
+                color:${element.color}; font-size:${element.size}px; display:flex;
+                align-items:center; justify-content:center; transform:rotate(${element.rotation}deg);">
+                ${element.content}
+            </div>
+            <div class="delete-btn">&times;</div>
+            <div class="resize-handle"></div>
+            <div class="rotate-handle"><i class="fas fa-sync-alt"></i></div>
+        `;
     }
+
+    // Initially hide controls
+    const deleteBtn = elementDiv.querySelector('.delete-btn');
+    const resizeHandle = elementDiv.querySelector('.resize-handle');
+    const rotateHandle = elementDiv.querySelector('.rotate-handle');
+    
+    deleteBtn.style.display = 'none';
+    resizeHandle.style.display = 'none';
+    rotateHandle.style.display = 'none';
+    
+    canvasOverlay.appendChild(elementDiv);
+    setupElementInteractions(elementDiv, element);
+}
 
     function setupElementInteractions(element, data) {
         const deleteBtn = element.querySelector('.delete-btn');
