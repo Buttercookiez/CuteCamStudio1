@@ -211,6 +211,18 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'warm': 
                 context.filter = 'brightness(1.1) hue-rotate(-20deg) saturate(1.5)'; 
                 break;
+            case 'sketch':
+                context.filter = 'contrast(1.5) brightness(1.1) saturate(0)';
+                break;
+            case 'stencil1':
+                context.filter = 'contrast(2) brightness(0)';
+                break;
+            case 'stencil2':
+                context.filter = 'contrast(2) brightness(0) invert(1)';
+                break;
+            case 'retro':
+                context.filter = 'sepia(0.5) contrast(1.25) brightness(1.15) saturate(2)';
+                break;
         }
     }
 
@@ -236,6 +248,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 '/assets/stickers/heart7.png', '/assets/stickers/heart8.png',
                 '/assets/stickers/heart9.png', '/assets/stickers/heart10.png'
             ],
+            cats: [
+                '/assets/stickers/cat1.png', '/assets/stickers/cat2.png',
+                '/assets/stickers/cat3.png', '/assets/stickers/cat4.png',
+                '/assets/stickers/cat5.png', '/assets/stickers/cat6.png',
+                '/assets/stickers/cat7.png', '/assets/stickers/cat8.png',
+                '/assets/stickers/cat9.png', '/assets/stickers/cat10.png'
+            ],
             props: [
                 '/assets/stickers/prop1.png', '/assets/stickers/prop2.png',
                 '/assets/stickers/prop3.png', '/assets/stickers/prop4.png',
@@ -256,6 +275,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 '/assets/stickers/animal5.png', '/assets/stickers/animal6.png',
                 '/assets/stickers/animal7.png', '/assets/stickers/animal8.png',
                 '/assets/stickers/animal9.png', '/assets/stickers/animal10.png'
+            ],
+            emoji: [
+                '/assets/stickers/emoji1.png', '/assets/stickers/emoji2.png',
+                '/assets/stickers/emoji3.png', '/assets/stickers/emoji4.png',
+                '/assets/stickers/emoji5.png', '/assets/stickers/emoji6.png'
             ]
         };
 
@@ -264,8 +288,30 @@ document.addEventListener('DOMContentLoaded', () => {
         stickers[category].forEach(sticker => {
             const stickerElement = document.createElement('div');
             stickerElement.className = 'sticker-option';
+            
+            const img = document.createElement('img');
+            img.src = sticker;
+            img.alt = 'Sticker';
+            img.loading = 'lazy';
+            
+            stickerElement.appendChild(img);
             stickerElement.dataset.src = sticker;
-            stickerElement.innerHTML = `<img src="${sticker}" alt="Sticker">`;
+            
+            // Add smooth hover effect
+            stickerElement.addEventListener('mouseenter', () => {
+                stickerElement.style.transform = 'scale(1.1)';
+                stickerElement.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+            });
+            
+            stickerElement.addEventListener('mouseleave', () => {
+                stickerElement.style.transform = 'scale(1)';
+                stickerElement.style.boxShadow = 'none';
+            });
+            
+            stickerElement.addEventListener('click', () => {
+                addStickerToCanvas(sticker);
+            });
+            
             stickersGrid.appendChild(stickerElement);
         });
     }
@@ -344,10 +390,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="rotate-handle"><i class="fas fa-sync-alt"></i></div>
             `;
         }
-        
-        // Hide resize and rotate handles initially
+
+        // Initially hide controls (they'll show when element is active)
+        const deleteBtn = elementDiv.querySelector('.delete-btn');
         const resizeHandle = elementDiv.querySelector('.resize-handle');
         const rotateHandle = elementDiv.querySelector('.rotate-handle');
+        
+        deleteBtn.style.display = 'none';
         resizeHandle.style.display = 'none';
         rotateHandle.style.display = 'none';
         
@@ -355,50 +404,45 @@ document.addEventListener('DOMContentLoaded', () => {
         setupElementInteractions(elementDiv, element);
     }
 
-    // In the setupElementInteractions function, modify the delete button event listener
-function setupElementInteractions(element, data) {
-    const deleteBtn = element.querySelector('.delete-btn');
-    const resizeHandle = element.querySelector('.resize-handle');
-    const rotateHandle = element.querySelector('.rotate-handle');
-    
-    // Modified delete button event listeners
-    deleteBtn.addEventListener('click', handleDelete);
-    deleteBtn.addEventListener('touchend', handleDelete);
-    
-    function handleDelete(e) {
-        e.stopPropagation();
-        e.preventDefault(); // Add this for touch events
-        removeElement(data.id);
-    }
-    
-    // Rest of the function remains the same...
-    // Show controls when element is clicked/tapped
-    element.addEventListener('click', handleElementClick);
-    element.addEventListener('touchstart', handleElementClick, { passive: false });
-    
-    function handleElementClick(e) {
-        // Prevent default for touch events to avoid double-tap zoom
-        if (e.type === 'touchstart') {
+    function setupElementInteractions(element, data) {
+        const deleteBtn = element.querySelector('.delete-btn');
+        const resizeHandle = element.querySelector('.resize-handle');
+        const rotateHandle = element.querySelector('.rotate-handle');
+        
+        // Delete button event listeners
+        deleteBtn.addEventListener('click', handleDelete);
+        deleteBtn.addEventListener('touchend', handleDelete);
+        
+        function handleDelete(e) {
+            e.stopPropagation();
             e.preventDefault();
+            removeElement(data.id);
         }
         
-        // Only proceed if the click wasn't on the delete button
-        if (e.target !== deleteBtn && !e.target.closest('.delete-btn')) {
-            // Hide all other controls first
-            document.querySelectorAll('.resize-handle, .rotate-handle').forEach(control => {
-                control.style.display = 'none';
-            });
-            document.querySelectorAll('.canvas-element').forEach(el => {
-                el.classList.remove('active');
-            });
+        // Show controls when element is clicked/tapped
+        element.addEventListener('click', handleElementClick);
+        element.addEventListener('touchstart', handleElementClick, { passive: false });
+        
+        function handleElementClick(e) {
+            if (e.type === 'touchstart') {
+                e.preventDefault();
+            }
             
-            // Show controls for this element
-            resizeHandle.style.display = 'flex';
-            rotateHandle.style.display = 'flex';
-            element.classList.add('active');
+            if (e.target !== deleteBtn && !e.target.closest('.delete-btn')) {
+                document.querySelectorAll('.resize-handle, .rotate-handle').forEach(control => {
+                    control.style.display = 'none';
+                });
+                document.querySelectorAll('.canvas-element').forEach(el => {
+                    el.classList.remove('active');
+                });
+                
+                resizeHandle.style.display = 'flex';
+                rotateHandle.style.display = 'flex';
+                element.classList.add('active');
+                deleteBtn.style.display = 'flex';
+            }
+            e.stopPropagation();
         }
-        e.stopPropagation();
-    }
         
         // Hide controls when clicking/touching outside
         document.addEventListener('click', hideControls);
@@ -409,6 +453,7 @@ function setupElementInteractions(element, data) {
                 resizeHandle.style.display = 'none';
                 rotateHandle.style.display = 'none';
                 element.classList.remove('active');
+                deleteBtn.style.display = 'none';
             }
         }
         
@@ -453,6 +498,8 @@ function setupElementInteractions(element, data) {
             const transform = element.style.transform;
             const match = transform.match(/rotate\(([-+]?\d*\.?\d+)deg\)/);
             startRotation = match ? parseFloat(match[1]) : 0;
+            
+            element.style.transition = 'transform 0.05s ease-out';
         }
         
         // Drag interaction
@@ -481,7 +528,6 @@ function setupElementInteractions(element, data) {
     function handleMouseMove(e) {
         if (!isDragging && !isResizing && !isRotating) return;
         
-        // Prevent default for touch events to avoid scrolling
         if (e.type === 'touchmove') {
             e.preventDefault();
         }
@@ -526,10 +572,8 @@ function setupElementInteractions(element, data) {
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
             
-            // Calculate current angle
             const angle = Math.atan2(clientY - centerY, clientX - centerX) * 180 / Math.PI;
             
-            // Calculate new rotation
             const rotation = startRotation + (angle - startAngle);
             currentRotation = rotation;
             
@@ -545,6 +589,9 @@ function setupElementInteractions(element, data) {
 
     function handleMouseUp() {
         if (isDragging || isResizing || isRotating) {
+            if (dragElement) {
+                dragElement.style.transition = 'none';
+            }
             saveToHistory();
         }
         isDragging = false;
@@ -626,71 +673,64 @@ function setupElementInteractions(element, data) {
     }
 
     function showPreviewModal() {
-    // Create a temporary canvas for the preview
-    const tempCanvas = document.createElement('canvas');
-    const borderSize = 5; // Reduced from 10 to 5 for thinner border
-    const photoBorderSize = 5; // Reduced from 10 to 5 for thinner photo borders
-    tempCanvas.width = canvas.width + (borderSize * 2);
-    tempCanvas.height = canvas.height + (borderSize * 2);
-    const tempCtx = tempCanvas.getContext('2d');
-    
-    // Draw white background for the border area
-    tempCtx.fillStyle = '#FFFFFF';
-    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-    
-    // Draw the frame background (offset by borderSize)
-    tempCtx.fillStyle = frameColor;
-    tempCtx.fillRect(
-        borderSize, 
-        borderSize, 
-        tempCanvas.width - (borderSize * 2), 
-        tempCanvas.height - (borderSize * 2)
-    );
-    
-    // Draw the photos (offset by borderSize)
-    const photoCount = Math.min(4, capturedPhotos.length);
-    const { photoSize, photoGap } = calculateDimensions(photoCount);
-    let yPos = FRAME_PADDING + borderSize;
-    
-    for (let i = 0; i < photoCount; i++) {
-        // Draw white border background first
+        const tempCanvas = document.createElement('canvas');
+        const borderSize = 5;
+        const photoBorderSize = 5;
+        tempCanvas.width = canvas.width + (borderSize * 2);
+        tempCanvas.height = canvas.height + (borderSize * 2);
+        const tempCtx = tempCanvas.getContext('2d');
+        
         tempCtx.fillStyle = '#FFFFFF';
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        
+        tempCtx.fillStyle = frameColor;
         tempCtx.fillRect(
-            FRAME_PADDING + borderSize - photoBorderSize, 
-            yPos - photoBorderSize, 
-            photoSize + (photoBorderSize * 2), 
-            photoSize + (photoBorderSize * 2)
+            borderSize, 
+            borderSize, 
+            tempCanvas.width - (borderSize * 2), 
+            tempCanvas.height - (borderSize * 2)
         );
-        
-        // Then draw the photo
-        const img = new Image();
-        img.src = capturedPhotos[i];
-        if (img.complete && img.naturalHeight !== 0) {
-            tempCtx.save();
-            applyFilter(tempCtx);
+
+        const photoCount = Math.min(4, capturedPhotos.length);
+        const { photoSize, photoGap } = calculateDimensions(photoCount);
+        let yPos = FRAME_PADDING + borderSize;
+
+        for (let i = 0; i < photoCount; i++) {
+            tempCtx.fillStyle = '#FFFFFF';
+            tempCtx.fillRect(
+                FRAME_PADDING + borderSize - photoBorderSize, 
+                yPos - photoBorderSize, 
+                photoSize + (photoBorderSize * 2), 
+                photoSize + (photoBorderSize * 2)
+            );
             
-            const imgAspect = img.width / img.height;
-            let drawWidth, drawHeight, x, y;
-            
-            if (imgAspect > 1) {
-                drawWidth = photoSize;
-                drawHeight = drawWidth / imgAspect;
-                x = FRAME_PADDING + borderSize;
-                y = yPos + (photoSize - drawHeight) / 2;
-            } else {
-                drawHeight = photoSize;
-                drawWidth = drawHeight * imgAspect;
-                x = FRAME_PADDING + borderSize + (photoSize - drawWidth) / 2;
-                y = yPos;
+            const img = new Image();
+            img.src = capturedPhotos[i];
+            if (img.complete && img.naturalHeight !== 0) {
+                tempCtx.save();
+                applyFilter(tempCtx);
+                
+                const imgAspect = img.width / img.height;
+                let drawWidth, drawHeight, x, y;
+                
+                if (imgAspect > 1) {
+                    drawWidth = photoSize;
+                    drawHeight = drawWidth / imgAspect;
+                    x = FRAME_PADDING + borderSize;
+                    y = yPos + (photoSize - drawHeight) / 2;
+                } else {
+                    drawHeight = photoSize;
+                    drawWidth = drawHeight * imgAspect;
+                    x = FRAME_PADDING + borderSize + (photoSize - drawWidth) / 2;
+                    y = yPos;
+                }
+                
+                tempCtx.drawImage(img, x, y, drawWidth, drawHeight);
+                tempCtx.restore();
             }
-            
-            tempCtx.drawImage(img, x, y, drawWidth, drawHeight);
-            tempCtx.restore();
+            yPos += photoSize + photoGap;
         }
-        yPos += photoSize + photoGap;
-    }
         
-        // Draw active elements (offset by borderSize)
         activeElements.forEach(element => {
             if (element.type === 'sticker') {
                 const img = new Image();
@@ -712,8 +752,8 @@ function setupElementInteractions(element, data) {
             } else if (element.type === 'text') {
                 tempCtx.save();
                 tempCtx.translate(
-                    text.x + text.width/2 + borderSize, 
-                    text.y + text.height/2 + borderSize
+                    element.x + element.width/2 + borderSize, 
+                    element.y + element.height/2 + borderSize
                 );
                 tempCtx.rotate(element.rotation * Math.PI / 180);
                 tempCtx.font = `${element.size}px ${element.font}`;
@@ -725,93 +765,75 @@ function setupElementInteractions(element, data) {
             }
         });
         
-        // Show the preview in modal
         modalPreviewImage.src = tempCanvas.toDataURL('image/png');
         previewModal.classList.add('active');
     }
 
     async function downloadCanvas() {
-    try {
-        // Show loading overlay
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.className = 'loading-overlay';
-        loadingOverlay.innerHTML = '<div>Preparing download...</div>';
-        document.body.appendChild(loadingOverlay);
+        try {
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.className = 'loading-overlay';
+            loadingOverlay.innerHTML = '<div>Preparing download...</div>';
+            document.body.appendChild(loadingOverlay);
 
-        const tempCanvas = document.createElement('canvas');
-        const borderSize = 5; // Reduced from 10 to 5 for thinner border
-        const photoBorderSize = 5; // Reduced from 10 to 5 for thinner photo borders
-        tempCanvas.width = canvas.width + (borderSize * 2);
-        tempCanvas.height = canvas.height + (borderSize * 2);
-        const tempCtx = tempCanvas.getContext('2d');
-        
-        // Draw white background for the border area
-        tempCtx.fillStyle = '#FFFFFF';
-        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-        
-        // Draw the frame background (offset by borderSize)
-        tempCtx.fillStyle = frameColor;
-        tempCtx.fillRect(
-            borderSize, 
-            borderSize, 
-            tempCanvas.width - (borderSize * 2), 
-            tempCanvas.height - (borderSize * 2)
-        );
-
-        // Process photos (offset by borderSize)
-        const photoCount = Math.min(4, capturedPhotos.length);
-        const { photoSize, photoGap } = calculateDimensions(photoCount);
-        let yPos = FRAME_PADDING + borderSize;
-
-        for (let i = 0; i < photoCount; i++) {
-            // Draw white border background first
+            const tempCanvas = document.createElement('canvas');
+            const borderSize = 5;
+            const photoBorderSize = 5;
+            tempCanvas.width = canvas.width + (borderSize * 2);
+            tempCanvas.height = canvas.height + (borderSize * 2);
+            const tempCtx = tempCanvas.getContext('2d');
+            
             tempCtx.fillStyle = '#FFFFFF';
+            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            
+            tempCtx.fillStyle = frameColor;
             tempCtx.fillRect(
-                FRAME_PADDING + borderSize - photoBorderSize, 
-                yPos - photoBorderSize, 
-                photoSize + (photoBorderSize * 2), 
-                photoSize + (photoBorderSize * 2)
+                borderSize, 
+                borderSize, 
+                tempCanvas.width - (borderSize * 2), 
+                tempCanvas.height - (borderSize * 2)
             );
-            
-            // Then draw the photo
-            const img = await loadImageSafe(capturedPhotos[i]);
-            if (!img) continue;
 
-            // Draw photo content with filter
-            tempCtx.save();
-            
-            // Apply the selected filter to the temp context
-            switch(currentFilter) {
-                case 'normal': tempCtx.filter = 'none'; break;
-                case 'grayscale': tempCtx.filter = 'grayscale(100%)'; break;
-                case 'sepia': tempCtx.filter = 'sepia(100%)'; break;
-                case 'bright': tempCtx.filter = 'brightness(1.2) contrast(1.1)'; break;
-                case 'cool': tempCtx.filter = 'brightness(1.1) hue-rotate(180deg) saturate(1.5)'; break;
-                case 'warm': tempCtx.filter = 'brightness(1.1) hue-rotate(-20deg) saturate(1.5)'; break;
-            }
-            
-            const imgAspect = img.width / img.height;
-            let drawWidth, drawHeight, x, y;
-            
-            if (imgAspect > 1) {
-                drawWidth = photoSize;
-                drawHeight = drawWidth / imgAspect;
-                x = FRAME_PADDING + borderSize;
-                y = yPos + (photoSize - drawHeight) / 2;
-            } else {
-                drawHeight = photoSize;
-                drawWidth = drawHeight * imgAspect;
-                x = FRAME_PADDING + borderSize + (photoSize - drawWidth) / 2;
-                y = yPos;
-            }
-            
-            tempCtx.drawImage(img, x, y, drawWidth, drawHeight);
-            tempCtx.restore();
-            
-            yPos += photoSize + photoGap;
-        }
+            const photoCount = Math.min(4, capturedPhotos.length);
+            const { photoSize, photoGap } = calculateDimensions(photoCount);
+            let yPos = FRAME_PADDING + borderSize;
 
-            // Process stickers with rotation (offset by borderSize)
+            for (let i = 0; i < photoCount; i++) {
+                tempCtx.fillStyle = '#FFFFFF';
+                tempCtx.fillRect(
+                    FRAME_PADDING + borderSize - photoBorderSize, 
+                    yPos - photoBorderSize, 
+                    photoSize + (photoBorderSize * 2), 
+                    photoSize + (photoBorderSize * 2)
+                );
+                
+                const img = await loadImageSafe(capturedPhotos[i]);
+                if (!img) continue;
+
+                tempCtx.save();
+                applyFilter(tempCtx);
+                
+                const imgAspect = img.width / img.height;
+                let drawWidth, drawHeight, x, y;
+                
+                if (imgAspect > 1) {
+                    drawWidth = photoSize;
+                    drawHeight = drawWidth / imgAspect;
+                    x = FRAME_PADDING + borderSize;
+                    y = yPos + (photoSize - drawHeight) / 2;
+                } else {
+                    drawHeight = photoSize;
+                    drawWidth = drawHeight * imgAspect;
+                    x = FRAME_PADDING + borderSize + (photoSize - drawWidth) / 2;
+                    y = yPos;
+                }
+                
+                tempCtx.drawImage(img, x, y, drawWidth, drawHeight);
+                tempCtx.restore();
+                
+                yPos += photoSize + photoGap;
+            }
+
             for (const element of activeElements.filter(el => el.type === 'sticker')) {
                 const img = await loadImageSafe(element.src);
                 if (img) {
@@ -832,7 +854,6 @@ function setupElementInteractions(element, data) {
                 }
             }
 
-            // Process text with rotation (offset by borderSize)
             activeElements
                 .filter(el => el.type === 'text')
                 .forEach(text => {
@@ -850,7 +871,6 @@ function setupElementInteractions(element, data) {
                     tempCtx.restore();
                 });
 
-            // Trigger download
             const link = document.createElement('a');
             link.download = 'cute-cam-' + new Date().toISOString().slice(0, 10) + '.png';
             link.href = tempCanvas.toDataURL('image/png');
@@ -928,13 +948,6 @@ function setupElementInteractions(element, data) {
             });
         });
         
-        stickersGrid.addEventListener('click', (e) => {
-            const stickerOption = e.target.closest('.sticker-option');
-            if (stickerOption) {
-                addStickerToCanvas(stickerOption.dataset.src);
-            }
-        });
-        
         addTextBtn.addEventListener('click', addTextToCanvas);
         
         textInput.addEventListener('keypress', (e) => {
@@ -955,7 +968,6 @@ function setupElementInteractions(element, data) {
             });
         });
         
-        // Preview modal triggers
         canvas.addEventListener('click', showPreviewModal);
         document.querySelector('.canvas-wrapper').addEventListener('click', showPreviewModal);
         
@@ -972,7 +984,6 @@ function setupElementInteractions(element, data) {
         document.addEventListener('mouseup', handleMouseUp);
         document.addEventListener('touchend', handleMouseUp);
         
-        // Prevent scrolling when interacting with elements
         document.querySelectorAll('.canvas-element, .resize-handle, .rotate-handle').forEach(el => {
             el.addEventListener('touchmove', (e) => {
                 if (isDragging || isResizing || isRotating) {
