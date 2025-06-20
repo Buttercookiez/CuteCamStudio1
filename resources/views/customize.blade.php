@@ -27,9 +27,9 @@
     <main class="customize-container">
         <div class="container">
             <div class="editor-wrapper">
-              <div class="photo-canvas-container">
-    @if(count($photoUrls) > 1)
-    <div class="photo-selection">
+           <div class="photo-canvas-container">
+    @if(count($photoUrls) > 0)
+    <div class="photo-selection" style="{{ count($photoUrls) === 1 ? 'display: none;' : '' }}">
         @foreach($photoUrls as $index => $url)
         <div class="photo-option {{ $index === 0 ? 'active' : '' }}" data-index="{{ $index }}">
             <img src="{{ $url }}" alt="Photo {{ $index + 1 }}">
@@ -42,6 +42,8 @@
         <canvas id="photo-canvas"></canvas>
         <div id="canvas-overlay"></div>
     </div>
+    
+   
     
     <div class="action-buttons">
         <button id="undo-btn" class="btn btn-outline">
