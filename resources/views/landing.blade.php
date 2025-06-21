@@ -364,7 +364,7 @@
                         <img src="assets/img/logo-icon.png" alt="CuteCam Logo" class="logo-icon">
                         <span class="logo-text">CuteCam</span>
                     </div>
-                    <p class="footer-about-text">Making photo magic since 2023. Capturing life's cutest moments one snap at a time.</p>
+                    <p class="footer-about-text">Making photo magic since 2025. Capturing life's cutest moments one snap at a time.</p>
                     <div class="social-links">
                         <a href="#" aria-label="Instagram">
                             <i class="fab fa-instagram"></i>
@@ -422,7 +422,7 @@
                     <a href="#">Cookie Policy</a>
                 </div>
                 <div class="footer-copyright">
-                    <p>&copy; 2023 CuteCam. All rights reserved.</p>
+                    <p>&copy; 2025 CuteCam. All rights reserved.</p>
                 </div>
             </div>
         </div>
