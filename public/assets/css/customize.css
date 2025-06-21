@@ -169,10 +169,9 @@ body {
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-lg);
     margin: 0 auto;
-    padding: 10px;
+    padding: 0px;
     position: relative;
     border: 1px solid var(--gray);
-    margin-bottom: 20px;
 }
 
 #photo-canvas {
@@ -905,10 +904,6 @@ body {
     .action-buttons .btn {
         padding: 10px 15px;
         font-size: 0.85rem;
-    }
-    
-    .canvas-wrapper {
-        padding: 15px;
     }
     
     .stickers-grid {
