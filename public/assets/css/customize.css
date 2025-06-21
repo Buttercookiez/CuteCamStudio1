@@ -877,7 +877,7 @@ body {
 
 @media (max-width: 768px) {
     .customize-container {
-        padding: 80px 0 40px;
+        padding: 0px 0 0px;
     }
     
     .logo-text {
