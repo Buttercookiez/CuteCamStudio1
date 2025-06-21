@@ -894,7 +894,7 @@ body {
     }
     
     .stickers-grid {
-        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(0px, 1fr));
     }
     
     .frame-colors-grid {
@@ -971,11 +971,4 @@ body {
         margin: 0 !important;
     }
     
-    .photo-canvas-container {
-        padding: 0 10px;
-    }
-    
-    .action-buttons {
-        padding: 0 10px;
-    }
 }
