@@ -163,15 +163,25 @@ body {
 }
 
 .canvas-wrapper {
+    width: 100%;
+    max-width: 400px;
+    background-color: var(--light);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    margin: 0 auto;
+    padding: 10px;
     position: relative;
-    overflow: visible;
-    margin-left: 0; /* Remove any left margin */
-    padding: 0px; /* Reduce padding */
+    border: 1px solid var(--gray);
+    margin-bottom: 20px;
 }
 
 #photo-canvas {
-    margin-left: 0; /* Ensure no left margin */
-    max-width: 100%;
+    width: 100%;
+    display: block;
+    background-color: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    border: 1px solid var(--gray);
 }
 
 .photo-selection {
@@ -875,6 +885,10 @@ body {
     outline-offset: 2px;
 }
 
+.canvas-element.active .delete-btn {
+    display: flex;
+}
+
 @media (max-width: 768px) {
     .customize-container {
         padding: 80px 0 40px;
@@ -891,6 +905,10 @@ body {
     .action-buttons .btn {
         padding: 10px 15px;
         font-size: 0.85rem;
+    }
+    
+    .canvas-wrapper {
+        padding: 15px;
     }
     
     .stickers-grid {
@@ -961,21 +979,11 @@ body {
 /* Mobile specific adjustments */
 @media (max-width: 768px) {
     .canvas-wrapper {
-        width: 100% !important;
-        padding: 0 !important;
-        margin: 0 auto;
+        padding: var(--mobile-canvas-padding) !important;
+        width: calc(100% - 2 * var(--mobile-canvas-padding)) !important;
     }
     
     #photo-canvas {
-        width: 100% !important;
-        margin: 0 !important;
-    }
-    
-    .photo-canvas-container {
-        padding: 0 10px;
-    }
-    
-    .action-buttons {
-        padding: 0 10px;
+        max-width: 100% !important;
     }
 }
