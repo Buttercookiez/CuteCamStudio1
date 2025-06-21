@@ -971,4 +971,11 @@ body {
         margin: 0 !important;
     }
     
+    .photo-canvas-container {
+        padding: 0 10px;
+    }
+    
+    .action-buttons {
+        padding: 0 10px;
+    }
 }
