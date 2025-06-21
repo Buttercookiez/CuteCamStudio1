@@ -976,12 +976,18 @@ body {
     #photo-canvas {
         max-width: 100% !important;
     }
-        .sticker-option {
-        padding: 100px; /* Match desktop padding */
-    }
     
     .stickers-grid {
-        gap: 0x; /* Adjust gap if needed */
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); /* Match desktop size */
+        gap: 10px; /* Slightly smaller gap for mobile */
     }
-    
+
+    .sticker-option {
+        padding: 10px; /* Explicitly set to match desktop */
+    }
+
+    .sticker-option img {
+        max-height: 50px; /* Slightly smaller to account for mobile */
+    }
+
 }
