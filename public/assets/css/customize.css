@@ -902,7 +902,7 @@ body {
     }
     
     .stickers-grid {
-        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(0px, 1fr));
     }
     
     .frame-colors-grid {
