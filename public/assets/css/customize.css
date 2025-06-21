@@ -977,11 +977,11 @@ body {
         max-width: 100% !important;
 
         .sticker-option {
-        padding: 10px; /* Match desktop padding */
+        padding: 50px; /* Match desktop padding */
     }
     
     .stickers-grid {
-        gap: 10x; /* Adjust gap if needed */
+        gap: 0x; /* Adjust gap if needed */
     }
     }
 }
