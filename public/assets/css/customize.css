@@ -877,7 +877,7 @@ body {
 
 @media (max-width: 768px) {
     .customize-container {
-        padding: 0px 0 0px;
+        padding: 80px 0 40px;
     }
     
     .logo-text {
@@ -894,7 +894,7 @@ body {
     }
     
     .stickers-grid {
-        grid-template-columns: repeat(auto-fill, minmax(0px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
     }
     
     .frame-colors-grid {
