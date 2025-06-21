@@ -975,13 +975,13 @@ body {
     
     #photo-canvas {
         max-width: 100% !important;
-
+    }
         .sticker-option {
-        padding: 50px; /* Match desktop padding */
+        padding: 100px; /* Match desktop padding */
     }
     
     .stickers-grid {
         gap: 0x; /* Adjust gap if needed */
     }
-    }
+    
 }
